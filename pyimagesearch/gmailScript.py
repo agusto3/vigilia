@@ -8,17 +8,19 @@ from email.mime.text import MIMEText
 from apiclient import errors, discovery
 
 SCOPES = 'https://www.googleapis.com/auth/gmail.send'
-CLIENT_SECRET_FILE = 'client_secret.json'
+CLIENT_SECRET_FILE = '/home/pi/Proyectos_OpenCv/Motion detection/Vigilancia/pyimagesearch/client_secret.json'
+#CLIENT_SECRET_FILE = 'client_secret.json'
 APPLICATION_NAME = 'Vigilia'
 
 class gmail:
-	def get_credentials():
+	def get_credentials(self):
 	    home_dir = os.path.expanduser('~')
 	    credential_dir = os.path.join(home_dir, '.credentials')
 	    if not os.path.exists(credential_dir):
 	        os.makedirs(credential_dir)
 	    credential_path = os.path.join(credential_dir,
 	                                   'gmail-python-email-send.json')
+	    
 	    store = oauth2client.file.Storage(credential_path)
 	    credentials = store.get()
 	    if not credentials or credentials.invalid:
@@ -28,14 +30,14 @@ class gmail:
 	        print 'Storing credentials to ' + credential_path
 	    return credentials
 	
-	def SendMessage(sender, to, subject, msgHtml, msgPlain):
-	    credentials = get_credentials()
+	def SendMessage(self,sender, to, subject, msgHtml, msgPlain):
+	    credentials = self.get_credentials()
 	    http = credentials.authorize(httplib2.Http())
 	    service = discovery.build('gmail', 'v1', http=http)
-	    message1 = CreateMessage(sender, to, subject, msgHtml, msgPlain)
-	    SendMessageInternal(service, "me", message1)
+	    message1 = self.CreateMessage(sender, to, subject, msgHtml, msgPlain)
+	    self.SendMessageInternal(service, "me", message1)
 	
-	def SendMessageInternal(service, user_id, message):
+	def SendMessageInternal(self,service, user_id, message):
 	    try:
 	        message = (service.users().messages().send(userId=user_id, body=message).execute())
 	        print 'Message Id: %s' % message['id']
@@ -43,7 +45,7 @@ class gmail:
 	    except errors.HttpError, error:
 	        print 'An error occurred: %s' % error
 	
-	def CreateMessage(sender, to, subject, msgHtml, msgPlain):
+	def CreateMessage(self,sender, to, subject, msgHtml, msgPlain):
 	    msg = MIMEMultipart('alternative')
 	    msg['Subject'] = subject
 	    msg['From'] = sender
@@ -52,3 +54,11 @@ class gmail:
 	    msg.attach(MIMEText(msgHtml, 'html'))
     	    return {'raw': base64.urlsafe_b64encode(msg.as_string())}
 
+	
+	def main(self):
+	    to = "agustinleira1@hotmail.com"
+	    sender = "tonypacheco333@gmail.com"
+	    subject = "Inicio de sistema"
+	    msgHtml = "Inicio"
+	    msgPlain = "Se ha establecido inicio de sistema"
+	    self.SendMessage(sender, to, subject, msgHtml, msgPlain)

@@ -3,7 +3,7 @@ from pyimagesearch.tempimage import TempImage
 from dropbox.client import DropboxOAuth2FlowNoRedirect
 from dropbox.client import DropboxClient
 
-#from pyimagesearch.gmailScript.py import gmail
+from pyimagesearch.gmailScript import gmail
 
 #from picamera.array import PiRGBArray
 from imutils.video import VideoStream
@@ -29,7 +29,10 @@ warnings.filterwarnings("ignore")
 conf = json.load(open(args["conf"]))
 client = None
 
-#SendMessage('tonypacheco333@gmail.com', 'agustinleira1@hotmail.com', 'Inicio de sistema', 'Inicio', 'Se ha establecido inicio de sistema')
+s = gmail()
+
+s.SendMessage("tonypacheco333@gmail.com", "agustinleira1@hotmail.com", "Inicio de sistema", "Inicio", "Se ha establecido inicio de sistema")
+#s.main()
 
 if conf["use_dropbox"]:
 	# connect to dropbox and start the session authorization process
