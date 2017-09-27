@@ -1,7 +1,8 @@
 # import the necessary packages
 from pyimagesearch.tempimage import TempImage
-from dropbox.client import DropboxOAuth2FlowNoRedirect
-from dropbox.client import DropboxClient
+#from dropbox.client import DropboxOAuth2FlowNoRedirect
+#from dropbox.client import DropboxClient
+import dropbox
 
 #from pyimagesearch.gmailScript import gmail
 
@@ -36,14 +37,17 @@ client = None
 
 if conf["use_dropbox"]:
 	# connect to dropbox and start the session authorization process
-	flow = DropboxOAuth2FlowNoRedirect(conf["dropbox_key"], conf["dropbox_secret"])
-	print "[INFO] Authorize this application: {}".format(flow.start())
-	authCode = raw_input("Enter auth code here: ").strip()
+	#flow = DropboxOAuth2FlowNoRedirect(conf["dropbox_key"], conf["dropbox_secret"])
+	#print "[INFO] Authorize this application: {}".format(flow.start())
+	#authCode = raw_input("Enter auth code here: ").strip()
  
 	# finish the authorization and grab the Dropbox client
-	(accessToken, userID) = flow.finish(authCode)
-	client = DropboxClient(accessToken)
-	print "[SUCCESS] dropbox account linked"
+	#(accessToken, userID) = flow.finish(authCode)
+	#client = DropboxClient(accessToken)
+	#print "[SUCCESS] dropbox account linked"
+	client = dropbox.Dropbox(conf["access_token"])
+	
+	print client.users_get_current_account()
 
 # initialize the video stream and allow the cammera sensor to warmup
 vs = VideoStream(usePiCamera=args["picamera"] > 0).start()
@@ -68,6 +72,8 @@ while True:
 	# grab the raw NumPy array representing the image and initialize
 	# the timestamp and occupied/unoccupied text
 	try:
+		
+	
 		frame = vs.read()
 		timestamp = datetime.datetime.now()
 		text = "Unoccupied"
@@ -132,12 +138,15 @@ while True:
 						# write the image to temporary file
 						t = TempImage()
 						cv2.imwrite(t.path, frame)
-	 
+	 					now = datetime.datetime.now()
+						nts = str(now.year) + '_' +( '0' + str(now.month)  if now.month < 10 else str(now.month) ) + '_' +( '0' + str(now.day) if now.day < 10 else str(now.day)) + '_' +( '0' + str(now.hour) if now.hour < 10 else str(now.hour) )  + '_' +( '0' + str(now.minute) if now.minute < 10 else str(now.minute) ) + '_' +( '0' + str(now.second) if now.second < 10 else str(now.second) ) + '_' +str(now.microsecond)
 						# upload the image to Dropbox and cleanup the tempory image
 						print "[UPLOAD] {}".format(ts)
-						path = "{base_path}/{timestamp}.jpg".format(
-							base_path=conf["dropbox_base_path"], timestamp=ts)
-						client.put_file(path, open(t.path, "rb"))
+						print nts
+						path = "/{base_path}/{timestamp}.jpg".format(
+							base_path=conf["dropbox_base_path"], timestamp=nts)
+						#client.put_file(path, open(t.path, "rb"))
+						client.files_upload(open(t.path, "rb"),path)
 						t.cleanup()
 	 
 					# update the last uploaded timestamp and reset the motion
@@ -154,15 +163,14 @@ while True:
 			# display the security feed
 			cv2.imshow("Security Feed", frame)
 			key = cv2.waitKey(1) & 0xFF
-	 
 			# if the `q` key is pressed, break from the lop
 			if key == ord("q"):
 				break
-	 
+	
 		# clear the stream in preparation for the next frame
 		#rawCapture.truncate(0)
-	except:	
-		print('An error occured trying to read the file.')	
+	except Exception as value:	
+		print('An error occured.',value)
 	
 # do a bit of cleanup
 cv2.destroyAllWindows()
