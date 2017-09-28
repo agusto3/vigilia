@@ -1,0 +1,16 @@
+{
+	"show_video": false,
+	"use_dropbox": true,
+	"dropbox_key": "37royxzc7cbp3uv",
+	"dropbox_secret": "lfggy27ccp6jw4c",
+	"dropbox_base_path": "Aplicaciones/vigilia",
+	"min_upload_seconds": 1.0,
+	"min_motion_frames": 7,
+	"camera_warmup_time": 2.5,
+	"delta_thresh": 4,
+	"video_lenght":10,
+	"resolution": [640, 480],
+	"fps": 60,
+	"min_area": 2500,
+	"access_token":"GKk18GeG-_sAAAAAAADOhAcXDdZVF7LA9fnnp8CpLtL8604apfGbZKoSE6Wgf-dK"
+}
